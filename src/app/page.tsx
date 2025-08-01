@@ -1,13 +1,35 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [convertedImages, setConvertedImages] = useState<string[]>([]);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (uploadStatus === 'uploading') {
+      setElapsedTime(0);
+      timerRef.current = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [uploadStatus]);
 
   const handleFileSelect = (file: File) => {
     if (file.type === 'application/pdf') {
@@ -188,8 +210,11 @@ export default function Home() {
                 <div className="text-center py-3">
                   <div className="inline-flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                    <span className="text-blue-600 font-medium">Converting...</span>
+                    <span className="text-blue-600 font-medium">Converting... {elapsedTime}s</span>
                   </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Processing your PDF, please wait...
+                  </p>
                 </div>
               )}
 
@@ -205,6 +230,9 @@ export default function Home() {
                     </svg>
                     <span className="font-medium">Conversion successful!</span>
                   </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Completed in {elapsedTime} seconds
+                  </p>
                   <button
                     onClick={resetUpload}
                     className="mt-3 text-blue-600 hover:text-blue-800 font-medium"

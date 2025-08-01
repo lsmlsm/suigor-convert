@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pdf } from 'pdf-to-img';
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -21,20 +24,30 @@ export async function POST(request: NextRequest) {
     }
     
     const fileBuffer = await file.arrayBuffer();
-    const document = await pdf(Buffer.from(fileBuffer), { scale: 2.0 });
+    const buffer = Buffer.from(fileBuffer);
     
-    const images: string[] = [];
-    
-    for await (const image of document) {
-      const base64Image = `data:image/png;base64,${image.toString('base64')}`;
-      images.push(base64Image);
+    try {
+      const document = await pdf(buffer, { scale: 2.0 });
+      
+      const images: string[] = [];
+      
+      for await (const image of document) {
+        const base64Image = `data:image/png;base64,${image.toString('base64')}`;
+        images.push(base64Image);
+      }
+      
+      return NextResponse.json({
+        success: true,
+        images,
+        pageCount: images.length
+      });
+    } catch (pdfError) {
+      console.error('PDF processing error:', pdfError);
+      return NextResponse.json(
+        { error: 'Failed to process PDF. Make sure the file is not corrupted.' },
+        { status: 500 }
+      );
     }
-    
-    return NextResponse.json({
-      success: true,
-      images,
-      pageCount: images.length
-    });
     
   } catch (error) {
     console.error('PDF conversion error:', error);
@@ -43,4 +56,11 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use POST to upload a PDF.' },
+    { status: 405 }
+  );
 }
