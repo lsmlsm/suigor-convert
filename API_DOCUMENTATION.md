@@ -1,9 +1,13 @@
-# PDF to JPG Conversion API Documentation
+# API Documentation
 
 ## Overview
-This API converts PDF files to JPG images. Each page of the PDF is converted into a separate base64-encoded PNG image.
+This service provides two main conversion APIs:
+1. **PDF to JPG Conversion** - Converts PDF files to JPG images
+2. **Text to LaTeX PDF** - Converts text with LaTeX notation to formatted PDF
 
-## Endpoint
+## Endpoints
+
+### 1. PDF to JPG Conversion
 ```
 POST https://suigor-convert-cb23e92afe90.herokuapp.com/api/convert-pdf-to-jpg
 ```
@@ -253,3 +257,199 @@ if ($httpCode == 200) {
 ## Support
 
 For issues or questions about the API, please refer to the application documentation or contact the service provider.
+
+---
+
+### 2. Text to LaTeX PDF Conversion
+
+## Endpoint
+```
+POST https://suigor-convert-cb23e92afe90.herokuapp.com/api/text-to-latex-pdf
+```
+
+## Request
+
+### Headers
+- `Content-Type: application/json`
+
+### Body
+```json
+{
+  "text": "Your text with LaTeX notation",
+  "options": {
+    "fontSize": 12,
+    "margin": 50
+  }
+}
+```
+
+**Parameters:**
+- `text` (required): String containing text with LaTeX notation
+  - Block math: `\[ ... \]`
+  - Inline math: `\( ... \)`
+  - Bold text: `*text*`
+- `options` (optional): PDF formatting options
+  - `fontSize`: Font size in points (default: 12)
+  - `margin`: Page margin in points (default: 50)
+
+## Response
+
+### Success Response
+**Status Code:** 200 OK
+**Content-Type:** application/pdf
+**Body:** Binary PDF file
+
+### Error Responses
+
+**No Text Provided**
+- Status Code: 400 Bad Request
+```json
+{
+  "error": "No text provided"
+}
+```
+
+**Processing Error**
+- Status Code: 500 Internal Server Error
+```json
+{
+  "error": "Failed to generate PDF",
+  "details": "Error message"
+}
+```
+
+## Example Usage
+
+### JavaScript (Node.js)
+```javascript
+const axios = require('axios');
+const fs = require('fs');
+
+async function convertTextToPDF(text) {
+  try {
+    const response = await axios.post(
+      'https://suigor-convert-cb23e92afe90.herokuapp.com/api/text-to-latex-pdf',
+      {
+        text: text,
+        options: {
+          fontSize: 12,
+          margin: 50
+        }
+      },
+      {
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    // Save PDF to file
+    fs.writeFileSync('output.pdf', response.data);
+    console.log('PDF saved as output.pdf');
+  } catch (error) {
+    console.error('Error:', error.response?.data || error.message);
+  }
+}
+
+// Example usage
+const mathText = `
+*Economic Equilibrium Example*
+
+Given:
+• Consumption: C = 10 + 0.8(Y - T)
+• Investment: I = 10
+• Government: G = 10
+• Taxes: T = 10
+
+The equilibrium equation is:
+\\[ Y = C + I + G \\]
+
+Substituting values:
+\\[ Y = (10 + 0.8(Y - 10)) + 10 + 10 \\]
+\\[ Y = 0.8Y + 2 + 20 \\]
+\\[ 0.2Y = 22 \\]
+\\[ Y = 110 \\]
+
+Therefore, the equilibrium output is \\( Y = 110 \\).
+`;
+
+convertTextToPDF(mathText);
+```
+
+### Python
+```python
+import requests
+
+def convert_text_to_pdf(text, filename='output.pdf'):
+    url = 'https://suigor-convert-cb23e92afe90.herokuapp.com/api/text-to-latex-pdf'
+    
+    payload = {
+        'text': text,
+        'options': {
+            'fontSize': 12,
+            'margin': 50
+        }
+    }
+    
+    response = requests.post(url, json=payload)
+    
+    if response.status_code == 200:
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+        print(f'PDF saved as {filename}')
+    else:
+        print(f'Error: {response.json()}')
+
+# Example usage
+math_text = r"""
+*Quadratic Formula*
+
+The general form of a quadratic equation is:
+\[ ax^2 + bx + c = 0 \]
+
+The solution is given by:
+\[ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \]
+
+For example, if \( a = 1 \), \( b = -5 \), and \( c = 6 \):
+\[ x = \frac{5 \pm \sqrt{25 - 24}}{2} = \frac{5 \pm 1}{2} \]
+
+Therefore, \( x = 3 \) or \( x = 2 \).
+"""
+
+convert_text_to_pdf(math_text)
+```
+
+### cURL
+```bash
+curl -X POST https://suigor-convert-cb23e92afe90.herokuapp.com/api/text-to-latex-pdf \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "The equation \\[ E = mc^2 \\] shows the relationship between energy and mass.",
+    "options": {
+      "fontSize": 14
+    }
+  }' \
+  --output formula.pdf
+```
+
+## Notes
+
+1. **LaTeX Support**: The API supports basic LaTeX math notation. Complex LaTeX commands may not render properly as the PDF uses standard fonts.
+
+2. **Text Formatting**: 
+   - Bold text: Use `*text*`
+   - Math blocks: Use `\[ ... \]` for centered equations
+   - Inline math: Use `\( ... \)` for inline equations
+
+3. **Limitations**: 
+   - Math formulas are rendered as blue text (not fully typeset)
+   - Limited to standard Helvetica fonts
+   - No support for images or complex LaTeX packages
+
+4. **File Size**: The generated PDFs are lightweight and suitable for deployment on serverless platforms.
+
+5. **Use Cases**: 
+   - Quick math document generation
+   - Academic notes and homework
+   - Technical documentation with formulas

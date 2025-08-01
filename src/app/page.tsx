@@ -114,6 +114,17 @@ export default function Home() {
           <p className="text-gray-600 dark:text-gray-300">
             Upload your PDF file to convert it to JPG images
           </p>
+          <div className="mt-4">
+            <a
+              href="/text-to-math"
+              className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              Try our Text to Math Formula Converter
+            </a>
+          </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
