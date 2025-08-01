@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -89,7 +90,7 @@ export default function Home() {
         setUploadStatus('error');
         alert(data.error || 'Failed to convert PDF');
       }
-    } catch (error) {
+    } catch {
       setUploadStatus('error');
       alert('An error occurred while converting the PDF');
     }
@@ -267,11 +268,16 @@ export default function Home() {
                   <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Page {index + 1}
                   </h3>
-                  <img 
-                    src={image} 
-                    alt={`Page ${index + 1}`}
-                    className="w-full max-w-2xl mx-auto rounded shadow-md"
-                  />
+                  <div className="relative w-full max-w-2xl mx-auto">
+                    <Image 
+                      src={image} 
+                      alt={`Page ${index + 1}`}
+                      width={800}
+                      height={1000}
+                      className="w-full h-auto rounded shadow-md"
+                      unoptimized
+                    />
+                  </div>
                   <a 
                     href={image} 
                     download={`page-${index + 1}.jpg`}

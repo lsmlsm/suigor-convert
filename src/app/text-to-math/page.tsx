@@ -338,7 +338,7 @@ For inline math, use \\( E = mc^2 \\)`}
               <BlockMath math="a^2 + b^2 = c^2" />
             </div>
             <div className="p-3 border border-gray-200 dark:border-gray-700 rounded">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Euler's Identity</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Euler&apos;s Identity</p>
               <BlockMath math="e^{i\pi} + 1 = 0" />
             </div>
             <div className="p-3 border border-gray-200 dark:border-gray-700 rounded">

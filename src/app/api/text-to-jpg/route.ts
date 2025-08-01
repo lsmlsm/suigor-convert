@@ -4,7 +4,14 @@ import sharp from 'sharp';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-function createSVG(text: string, options: any = {}): string {
+interface CreateSVGOptions {
+  width?: number;
+  height?: number;
+  padding?: number;
+  fontSize?: number;
+}
+
+function createSVG(text: string, options: CreateSVGOptions = {}): string {
   const width = options.width || 800;
   const height = options.height || 600;
   const padding = options.padding || 40;

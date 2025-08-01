@@ -108,7 +108,11 @@ export async function POST(request: NextRequest) {
     };
 
     // Helper function to add text with word wrap
-    const addTextWithWrap = (text: string, x: number, y: number, options: any = {}) => {
+    interface TextOptions {
+      align?: 'left' | 'center' | 'right';
+    }
+    
+    const addTextWithWrap = (text: string, x: number, y: number, options: TextOptions = {}) => {
       const preparedText = prepareTextForPDF(text);
       const lines = pdf.splitTextToSize(preparedText, maxWidth);
       let currentY = y;
