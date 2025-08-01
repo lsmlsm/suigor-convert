@@ -75,7 +75,7 @@ export default function Home() {
       const formData = new FormData();
       formData.append('pdf', selectedFile);
       
-      const response = await fetch('/api/convert', {
+      const response = await fetch('/api/convert-pdf-to-jpg', {
         method: 'POST',
         body: formData,
       });
